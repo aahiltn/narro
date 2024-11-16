@@ -5,9 +5,21 @@ import { useEffect, useState } from "react";
 export default function Home() {
   const handleCreateStudent = async () => {
     try {
-      // Example student data - modify according to your needs
       const studentData = {
-        name: "Test Student",
+        name: "John Smith",
+        classSections: {
+          create: {
+            role: "STUDENT",
+            classSection: {
+              create: {
+                name: "Spanish 101",
+                language: "Spanish",
+                teacherId: 1,
+                level: "BEGINNER"
+              }
+            }
+          }
+        }
       };
       
       const newStudent = await createStudent(studentData);
