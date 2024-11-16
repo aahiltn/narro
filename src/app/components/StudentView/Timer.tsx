@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 
 interface TimerProps {
-  duration: number; // in minutes
+  duration: number;
   onTimeUp: () => void;
-  className?: string;
 }
 
-export function Timer({ duration, onTimeUp, className }: TimerProps) {
+export function Timer({ duration, onTimeUp }: TimerProps) {
   const [timeLeft, setTimeLeft] = useState(duration * 60);
 
   useEffect(() => {
@@ -28,9 +27,9 @@ export function Timer({ duration, onTimeUp, className }: TimerProps) {
   const seconds = timeLeft % 60;
 
   return (
-    <div className={className}>
+    <span className="font-medium">
       {minutes.toString().padStart(2, "0")}:
       {seconds.toString().padStart(2, "0")}
-    </div>
+    </span>
   );
 }

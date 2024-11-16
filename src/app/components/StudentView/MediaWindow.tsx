@@ -39,8 +39,8 @@ export function MediaWindow({ questionId }: MediaWindowProps) {
       <img
         src={mediaUrl}
         alt="AI Generated Content"
-        className="w-full h-full object-contain"
-      />
+        className="h-64 w-full rounded-lg object-cover"
+        />
     </div>
   );
 }
