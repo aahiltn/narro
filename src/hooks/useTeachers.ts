@@ -7,7 +7,7 @@ interface UseTeachersReturn {
   loading: boolean;
   error: Error | null;
   fetchTeachers: () => Promise<void>;
-  newTeacher: (data: Omit<Teacher, "id">) => Promise<Teacher | null>;
+  createNewTeacher: (data: Omit<Teacher, "id">) => Promise<Teacher>;
 }
 
 export function useTeachers(): UseTeachersReturn {
@@ -18,8 +18,8 @@ export function useTeachers(): UseTeachersReturn {
   const fetchTeachers = async () => {
     try {
       setLoading(true);
-      const response = await getTeachers();
-      setTeachers(response);
+      const data = await getTeachers();
+      setTeachers(data);
     } catch (err) {
       setError(err as Error);
     } finally {
@@ -27,17 +27,9 @@ export function useTeachers(): UseTeachersReturn {
     }
   };
 
-  const newTeacher = async (data: Omit<Teacher, "id">) => {
-    try {
-      const response = await createTeacher(data);
-      return response;
-    } catch (err) {
-      setError(err as Error);
-    } finally {
-      setLoading(false);
-    }
-    return null;
+  const createNewTeacher = async (data: Omit<Teacher, "id">) => {
+    return await createTeacher(data);
   };
 
-  return { teachers, loading, error, fetchTeachers, newTeacher };
-} 
+  return { teachers, loading, error, fetchTeachers, createNewTeacher };
+}

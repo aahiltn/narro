@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getStudents, createStudent } from "@/api/dal/students";
+import { api } from "@/lib/axios";
 import { Student } from "@prisma/client";
 
 interface UseStudentsReturn {
@@ -7,7 +7,7 @@ interface UseStudentsReturn {
   loading: boolean;
   error: Error | null;
   fetchStudents: () => Promise<void>;
-  newStudent: (data: Omit<Student, "id">) => Promise<Student | null>;
+  createStudent: (data: Omit<Student, "id">) => Promise<Student>;
 }
 
 export function useStudents(): UseStudentsReturn {
@@ -18,8 +18,8 @@ export function useStudents(): UseStudentsReturn {
   const fetchStudents = async () => {
     try {
       setLoading(true);
-      const response = await getStudents();
-      setStudents(response);
+      const response = await api.get("/students");
+      setStudents(response.data);
     } catch (err) {
       setError(err as Error);
     } finally {
@@ -27,17 +27,10 @@ export function useStudents(): UseStudentsReturn {
     }
   };
 
-  const newStudent = async (data: Omit<Student, "id">) => {
-    try {
-      const response = await createStudent(data);
-      return response;
-    } catch (err) {
-      setError(err as Error);
-    } finally {
-      setLoading(false);
-    }
-    return null;
+  const createStudent = async (data: Omit<Student, "id">) => {
+    const response = await api.post("/students", data);
+    return response.data;
   };
 
-  return { students, loading, error, fetchStudents, newStudent };
-} 
+  return { students, loading, error, fetchStudents, createStudent };
+}

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getExams, createExam } from "@/api/dal/exams";
+import { api } from "@/lib/axios";
 import { Exam } from "@prisma/client";
 
 interface UseExamsReturn {
@@ -7,7 +7,7 @@ interface UseExamsReturn {
   loading: boolean;
   error: Error | null;
   fetchExams: () => Promise<void>;
-  newExam: (data: Omit<Exam, "id">) => Promise<Exam | null>;
+  createExam: (data: Omit<Exam, "id">) => Promise<Exam>;
 }
 
 export function useExams(): UseExamsReturn {
@@ -18,8 +18,8 @@ export function useExams(): UseExamsReturn {
   const fetchExams = async () => {
     try {
       setLoading(true);
-      const response = await getExams();
-      setExams(response);
+      const response = await api.get("/exams");
+      setExams(response.data);
     } catch (err) {
       setError(err as Error);
     } finally {
@@ -27,17 +27,10 @@ export function useExams(): UseExamsReturn {
     }
   };
 
-  const newExam = async (data: Omit<Exam, "id">) => {
-    try {
-      const response = await createExam(data);
-      return response;
-    } catch (err) {
-      setError(err as Error);
-    } finally {
-      setLoading(false);
-    }
-    return null;
+  const createExam = async (data: Omit<Exam, "id">) => {
+    const response = await api.post("/exams", data);
+    return response.data;
   };
 
-  return { exams, loading, error, fetchExams, newExam };
-} 
+  return { exams, loading, error, fetchExams, createExam };
+}

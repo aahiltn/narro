@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getQuestions, createQuestion } from "@/api/dal/questions";
+import { api } from "@/lib/axios";
 import { Question } from "@prisma/client";
 
 interface UseQuestionsReturn {
@@ -7,7 +7,7 @@ interface UseQuestionsReturn {
   loading: boolean;
   error: Error | null;
   fetchQuestions: () => Promise<void>;
-  newQuestion: (data: Omit<Question, "id">) => Promise<Question | null>;
+  createQuestion: (data: Omit<Question, "id">) => Promise<Question>;
 }
 
 export function useQuestions(): UseQuestionsReturn {
@@ -18,8 +18,8 @@ export function useQuestions(): UseQuestionsReturn {
   const fetchQuestions = async () => {
     try {
       setLoading(true);
-      const response = await getQuestions();
-      setQuestions(response);
+      const response = await api.get("/questions");
+      setQuestions(response.data);
     } catch (err) {
       setError(err as Error);
     } finally {
@@ -27,17 +27,10 @@ export function useQuestions(): UseQuestionsReturn {
     }
   };
 
-  const newQuestion = async (data: Omit<Question, "id">) => {
-    try {
-      const response = await createQuestion(data);
-      return response;
-    } catch (err) {
-      setError(err as Error);
-    } finally {
-      setLoading(false);
-    }
-    return null;
+  const createQuestion = async (data: Omit<Question, "id">) => {
+    const response = await api.post("/questions", data);
+    return response.data;
   };
 
-  return { questions, loading, error, fetchQuestions, newQuestion };
-} 
+  return { questions, loading, error, fetchQuestions, createQuestion };
+}

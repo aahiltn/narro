@@ -31,8 +31,8 @@ model ClassSection {
   id            String                @id @default(auto()) @map("_id") @db.ObjectId
   sectionNumber String
   students      StudentClassSection[]
-  teacher       Teacher   @relation(fields: [teacherId], references: [id])
-  teacherId     String    @db.ObjectId
+  teacher       Teacher?   @relation(fields: [teacherId], references: [id])
+  teacherId     String?    @db.ObjectId
   units         Unit[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -63,17 +63,21 @@ model Exam {
   timeLimit DateTime?
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+  unit      Unit       @relation(fields: [unitId], references: [id])
+  unitId    String     @db.ObjectId
 }
 
 model Unit {
   id            String       @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
   keywords      String[]
-  classSection  ClassSection @relation(fields: [classSectionId], references: [id])
-  classSectionId String      @db.ObjectId
-  teacher       Teacher      @relation(fields: [teacherId], references: [id])
-  teacherId     String       @db.ObjectId
+  classSection  ClassSection? @relation(fields: [classSectionId], references: [id])
+  classSectionId String?      @db.ObjectId
+  teacher       Teacher?      @relation(fields: [teacherId], references: [id])
+  teacherId     String?       @db.ObjectId
   language      String
   teacherNotes  String
+  exams         Exam[]
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
 } 
