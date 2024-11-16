@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // You can change this to your preferred database
+  url      = env("DATABASE_URL")
+}
+
+model Student {
+  id            Int            @id @default(autoincrement())
+  name          String
+  classSections ClassSection[] @relation("StudentToSection")
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model ClassSection {
+  id            Int       @id @default(autoincrement())
+  sectionNumber String
+  students      Student[] @relation("StudentToSection")
+  teacher       Teacher   @relation(fields: [teacherId], references: [id])
+  teacherId     Int
+  units         Unit[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Teacher {
+  id           Int            @id @default(autoincrement())
+  sections     ClassSection[]
+  units        Unit[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model Question {
+  id        Int       @id @default(autoincrement())
+  image     String?   // URL or path to image
+  prompt    String
+  timeLimit DateTime?
+  exam      Exam?     @relation(fields: [examId], references: [id])
+  examId    Int?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Exam {
+  id        Int        @id @default(autoincrement())
+  questions Question[]
+  timeLimit DateTime?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Unit {
+  id            Int          @id @default(autoincrement())
+  keywords      String[]
+  classSection  ClassSection @relation(fields: [classSectionId], references: [id])
+  classSectionId Int
+  teacher       Teacher      @relation(fields: [teacherId], references: [id])
+  teacherId     Int
+  language      String
+  teacherNotes  String
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+} 
