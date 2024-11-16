@@ -40,4 +40,4 @@ export function useStudents(): UseStudentsReturn {
   };
 
   return { students, loading, error, fetchStudents, newStudent };
-} 
+}

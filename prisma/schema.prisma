@@ -58,13 +58,16 @@ model Question {
 }
 
 model Exam {
-  id        String     @id @default(auto()) @map("_id") @db.ObjectId
-  questions Question[]
-  timeLimit DateTime?
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  unit      Unit       @relation(fields: [unitId], references: [id])
-  unitId    String     @db.ObjectId
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String
+  questions   Question[] 
+  timeLimit   DateTime?
+  status      String?    @default("draft")
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  unit        Unit       @relation(fields: [unitId], references: [id])
+  unitId      String     @db.ObjectId
 }
 
 model Unit {
