@@ -59,7 +59,7 @@ model Question {
 
 model Exam {
   id          String     @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
+  name        String  
   description String
   questions   Question[] 
   timeLimit   DateTime?

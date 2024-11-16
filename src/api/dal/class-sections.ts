@@ -14,6 +14,7 @@ export async function getSections(): Promise<ClassSection[]> {
     return sections;
   } catch (error) {
     throw new Error("Failed to fetch sections");
+    throw new Error("Failed to fetch sections");
   }
 }
 
@@ -26,6 +27,7 @@ export async function createSection(
     });
     return section;
   } catch (error) {
+    throw new Error("Failed to create section");
     throw new Error("Failed to create section");
   }
 }

@@ -11,7 +11,7 @@ export async function getTeachers() {
     });
     return teachers;
   } catch (error) {
-    throw new Error('Failed to fetch teachers');
+    throw new Error("Failed to fetch teachers");
   }
 }
 
@@ -22,6 +22,6 @@ export async function createTeacher(data: any) {
     });
     return teacher;
   } catch (error) {
-    throw new Error('Failed to create teacher');
+    throw new Error("Failed to create teacher");
   }
 }

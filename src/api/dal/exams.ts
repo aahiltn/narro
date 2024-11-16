@@ -1,8 +1,9 @@
+"use server";
+
 import { prisma } from "@/lib/prisma";
 import axios from "axios";
 
 export async function getExams() {
-  "use server";
   try {
     const exams = await prisma.exam.findMany({
       include: {
@@ -16,7 +17,6 @@ export async function getExams() {
 }
 
 export async function createExam(data: any) {
-  "use server";
   try {
     const exam = await prisma.exam.create({
       data,
@@ -28,7 +28,6 @@ export async function createExam(data: any) {
 }
 
 export async function getExam(id: string) {
-  "use server";
   const exam = await prisma.exam.findUnique({
     where: { id },
   });
