@@ -69,6 +69,7 @@ model Exam {
 
 model Unit {
   id            String       @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
   keywords      String[]
   classSection  ClassSection? @relation(fields: [classSectionId], references: [id])
   classSectionId String?      @db.ObjectId

@@ -6,11 +6,10 @@ import { Dialog } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 
 interface UnitFormData {
+  name: string;
   language: string;
   keywords: string[];
   teacherNotes: string;
-  classSectionId: string;
-  teacherId: string;
 }
 
 const LANGUAGES = [
@@ -51,11 +50,14 @@ export default function TeacherUnitsPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      console.log("Submitting form data:", formData);
       const submitData = {
+        name: formData.name,
         language: formData.language,
         keywords: formData.keywords || [],
         teacherNotes: formData.teacherNotes,
       };
+      console.log("Submit data:", submitData);
       await createUnit(submitData);
       setIsModalOpen(false);
       setFormData({} as UnitFormData);
@@ -120,7 +122,8 @@ export default function TeacherUnitsPage() {
             key={unit.id}
             className="border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
           >
-            <h3 className="font-bold mb-2">{unit.language}</h3>
+            <h3 className="font-bold mb-2">{unit.name}</h3>
+            <p className="text-sm text-gray-600">{unit.language}</p>
             <p className="text-sm text-gray-600 mb-2">
               Keywords: {unit.keywords.join(", ")}
             </p>
@@ -142,6 +145,21 @@ export default function TeacherUnitsPage() {
             </Dialog.Title>
 
             <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Unit Name
+                </label>
+                <input
+                  type="text"
+                  value={formData.name || ""}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
+                  className="w-full border rounded p-2"
+                  required
+                />
+              </div>
+
               <div>
                 <label className="block text-sm font-medium mb-1">
                   Language

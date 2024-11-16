@@ -11,6 +11,7 @@ export async function GET() {
     });
     return NextResponse.json(units);
   } catch (error) {
+    console.error("Error fetching units:", error);
     return NextResponse.json(
       { error: "Failed to fetch units" },
       { status: 500 }
@@ -21,30 +22,51 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const data = await request.json();
-    console.log("BACKEND: ", data);
+    console.log("BACKEND POST data:", data);
 
     // Validate required fields
-    if (!data.language || !data.teacherNotes) {
+    if (!data.name || !data.language || !data.teacherNotes) {
       return NextResponse.json(
         {
           error:
-            "Missing required fields: language and teacherNotes are required",
+            "Missing required fields: name, language and teacherNotes are required",
         },
         { status: 400 }
       );
     }
 
-    const unit = await prisma.unit.create({
-      data: {
-        language: data.language,
-        keywords: data.keywords || [],
-        teacherNotes: data.teacherNotes,
-      },
-    });
+    try {
+      const unit = await prisma.unit.create({
+        data: {
+          name: data.name,
+          language: data.language,
+          keywords: data.keywords || [],
+          teacherNotes: data.teacherNotes,
+        },
+      });
+      return NextResponse.json(unit);
+    } catch (prismaError) {
+      // Log the specific Prisma error
+      console.error("Prisma Create Error:", {
+        error: prismaError,
+        message:
+          prismaError instanceof Error ? prismaError.message : "Unknown error",
+        data: data,
+      });
 
-    return NextResponse.json(unit);
+      return NextResponse.json(
+        {
+          error: "Database error creating unit",
+          details:
+            prismaError instanceof Error
+              ? prismaError.message
+              : "Unknown error",
+        },
+        { status: 500 }
+      );
+    }
   } catch (error) {
-    console.error("Server error creating unit:", error);
+    console.error("Server error in POST /api/units:", error);
     return NextResponse.json(
       {
         error: "Failed to create unit",
