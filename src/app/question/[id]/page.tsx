@@ -82,7 +82,7 @@ export default function QuestionPage() {
 
           <div className="mb-8">
             <h2 className="mb-2 text-xl font-semibold">
-              Describe the Above Image In Spanish:{" "}
+              Describe the Above Image In {question.language}:{" "}
             </h2>
             <p className="text-sm text-gray-500">
               hint: Describe the colors, objects, actions, people, and the place

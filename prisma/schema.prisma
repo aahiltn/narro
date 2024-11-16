@@ -50,6 +50,7 @@ model Question {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   image     String?   // URL or path to image
   prompt    String
+  language  String
   timeLimit DateTime?
   exam      Exam?     @relation(fields: [examId], references: [id])
   examId    String?   @db.ObjectId

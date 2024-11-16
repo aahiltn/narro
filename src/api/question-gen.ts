@@ -1,12 +1,13 @@
-'use server'
+"use server";
 
-import { createQuestion } from './dal/questions';
-import { generateImageFromKeywords } from './image-gen';
-import { GenerateQuestionRequest } from '@/types/question';
+import { createQuestion } from "./dal/questions";
+import { generateImageFromKeywords } from "./image-gen";
+import { GenerateQuestionRequest } from "@/types/question";
 
 export async function createQuestionFromKeywords({
   keywords,
   unitDescription,
+  language,
 }: GenerateQuestionRequest) {
   try {
     const { imageUrl, description } = await generateImageFromKeywords({
@@ -17,23 +18,21 @@ export async function createQuestionFromKeywords({
     const questionData = {
       image: imageUrl,
       prompt: description,
+      language,
     };
 
-    console.log("PAYLOAD: ", questionData)
+    console.log("PAYLOAD: ", questionData);
 
     const newQuestion = await createQuestion(questionData);
-    
-    // Return a serializable response
+
     return {
       success: true,
       data: newQuestion,
     };
-
   } catch (error) {
-    //console.error("Error in createQuestionFromKeywords:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error occurred',
+      error: error instanceof Error ? error.message : "Unknown error occurred",
     };
   }
-} 
+}

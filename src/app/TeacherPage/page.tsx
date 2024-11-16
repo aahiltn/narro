@@ -104,6 +104,7 @@ export default function TeacherUnitsPage() {
         body: JSON.stringify({
           keywords: unit.keywords,
           unitDescription: unit.teacherNotes,
+          language: unit.language,
         }),
       });
 
@@ -211,7 +212,6 @@ export default function TeacherUnitsPage() {
         </div>
       </div>
 
-      {/* Modal remains the same but with updated colors */}
       <Dialog
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -313,17 +313,17 @@ export default function TeacherUnitsPage() {
                 />
               </div>
 
-              <div className="flex justify-end space-x-2 mt-6">
+              <div className="flex justify-end space-x-2 mt-4">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                 >
                   Create Unit
                 </button>
