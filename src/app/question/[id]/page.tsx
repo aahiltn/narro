@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Question } from "@prisma/client";
 
 export default function QuestionPage() {
   const params = useParams();
+  const router = useRouter();
   const [question, setQuestion] = useState<Question | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -30,6 +31,10 @@ export default function QuestionPage() {
     }
   }, [params.id]);
 
+  const handleBack = () => {
+    router.push("/TeacherPage");
+  };
+
   if (loading)
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -48,6 +53,7 @@ export default function QuestionPage() {
       {/* Left sidebar */}
       <aside className="w-64 border-r bg-white p-6">
         <div className="mb-8">
+          <img src="/Narro-logo.svg" alt="Narro" className="h-8 mb-8" />
           <div className="flex items-center space-x-2 rounded-lg bg-gray-100 px-4 py-2">
             <span className="font-medium">12:30</span>
           </div>
@@ -92,8 +98,11 @@ export default function QuestionPage() {
           />
 
           <div className="flex items-center justify-between">
-            <button className="px-4 py-2 border rounded-lg hover:bg-gray-50">
-              Save
+            <button
+              onClick={handleBack}
+              className="px-4 py-2 border rounded-lg hover:bg-gray-50 flex items-center space-x-2"
+            >
+              <span>Back</span>
             </button>
             <button className="px-4 py-2 bg-[#EA5658] text-white rounded-lg hover:bg-[#EB5759]">
               Next
