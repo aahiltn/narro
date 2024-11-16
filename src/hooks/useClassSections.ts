@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { api } from "@/lib/axios";
+import { getSections, createSection } from "@/api/dal/class-sections";
 import { ClassSection } from "@prisma/client";
 
 interface UseClassSectionsReturn {
@@ -7,7 +7,7 @@ interface UseClassSectionsReturn {
   loading: boolean;
   error: Error | null;
   fetchSections: () => Promise<void>;
-  createSection: (data: Omit<ClassSection, "id">) => Promise<ClassSection>;
+  newSection: (data: Omit<ClassSection, "id">) => Promise<ClassSection | null>;
 }
 
 export function useClassSections(): UseClassSectionsReturn {
@@ -18,8 +18,8 @@ export function useClassSections(): UseClassSectionsReturn {
   const fetchSections = async () => {
     try {
       setLoading(true);
-      const response = await api.get("/class-sections");
-      setSections(response.data);
+      const response = await getSections();
+      setSections(response);
     } catch (err) {
       setError(err as Error);
     } finally {
@@ -27,10 +27,17 @@ export function useClassSections(): UseClassSectionsReturn {
     }
   };
 
-  const createSection = async (data: Omit<ClassSection, "id">) => {
-    const response = await api.post("/class-sections", data);
-    return response.data;
+  const newSection = async (data: Omit<ClassSection, "id">) => {
+    try {
+      const response = await createSection(data);
+      return response;
+    } catch (err) {
+      setError(err as Error);
+    } finally {
+      setLoading(false);
+    }
+    return null;
   };
 
-  return { sections, loading, error, fetchSections, createSection };
+  return { sections, loading, error, fetchSections, newSection };
 }
