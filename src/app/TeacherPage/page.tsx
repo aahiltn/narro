@@ -269,13 +269,13 @@ export default function TeacherUnitsPage() {
                   {formData.keywords?.map((keyword) => (
                     <span
                       key={keyword}
-                      className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm flex items-center"
+                      className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-sm flex items-center"
                     >
                       {keyword}
                       <button
                         type="button"
                         onClick={() => removeKeyword(keyword)}
-                        className="ml-1 hover:text-blue-900"
+                        className="ml-1 hover:text-red-900"
                       >
                         <XMarkIcon className="h-4 w-4" />
                       </button>
@@ -323,7 +323,7 @@ export default function TeacherUnitsPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
                 >
                   Create Unit
                 </button>
