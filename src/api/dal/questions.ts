@@ -1,5 +1,6 @@
 'use server'
 import { prisma } from "@/lib/prisma";
+import { Question } from "@prisma/client";
 
 export async function getQuestions() {
   try {
@@ -10,17 +11,35 @@ export async function getQuestions() {
     });
     return questions;
   } catch (error) {
+    console.error('Error fetching questions:', error);
     throw new Error('Failed to fetch questions');
   }
 }
 
-export async function createQuestion(data: any) {
+export async function createQuestion(data: {
+  prompt: string;
+  image?: string | null;
+}): Promise<Question> {
   try {
     const question = await prisma.question.create({
-      data,
+      data: {
+        prompt: data.prompt,
+        image: data.image || null,
+      },
     });
-    return question;
+    
+    // Return a plain object instead of the Prisma model
+    return {
+      id: question.id,
+      prompt: question.prompt,
+      image: question.image,
+      timeLimit: question.timeLimit,
+      examId: question.examId,
+      createdAt: question.createdAt,
+      updatedAt: question.updatedAt,
+    };
   } catch (error) {
-    throw new Error('Failed to create question');
+    console.error('Prisma error:', error);
+    throw new Error('Failed to create question in database');
   }
 }
