@@ -1,6 +1,5 @@
 // Define the endpoint and LanguageTool parameters
 const url = "https://api.languagetoolplus.com/v2/check"; // Replace with your actual endpoint if different
-const language = "es"; // Set to 'es' for Spanish
 
 // Function to calculate similarity
 function similarityRatio(word1: string, word2: string): number {

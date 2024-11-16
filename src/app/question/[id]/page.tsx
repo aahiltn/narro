@@ -15,10 +15,18 @@ export default function QuestionPage() {
   const [answer, setAnswer] = useState("");
   const [showScore, setShowScore] = useState(false);
   const [score, setScore] = useState<number | null>(null);
+  const [nextLoading, setNextLoading] = useState(false);
+  const [questionNumber, setQuestionNumber] = useState(1);
 
   useEffect(() => {
     fetchQuestion();
   }, []);
+
+  useEffect(() => {
+    if (params.id) {
+      setQuestionNumber((prev) => prev + 1);
+    }
+  }, [params.id]);
 
   const fetchQuestion = async () => {
     try {
@@ -34,6 +42,7 @@ export default function QuestionPage() {
   };
 
   const handleBack = () => {
+    setQuestionNumber(1);
     router.push("/TeacherPage");
   };
 
@@ -53,6 +62,38 @@ export default function QuestionPage() {
     } catch (error) {
       console.error("Error grading answer:", error);
       setError("Failed to grade answer");
+    }
+  };
+
+  const handleNext = async () => {
+    try {
+      if (!question) return;
+      setNextLoading(true);
+
+      const response = await fetch("/api/questions/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          keywords: question.keywords,
+          unitDescription: "Practice question",
+          language: question.language,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.data.id) {
+        router.push(`/question/${data.data.id}`);
+      } else {
+        setError("Failed to generate next question");
+      }
+    } catch (error) {
+      console.error("Error generating next question:", error);
+      setError("Failed to generate next question");
+    } finally {
+      setNextLoading(false);
     }
   };
 
@@ -89,7 +130,7 @@ export default function QuestionPage() {
       {/* Main content */}
       <div className="flex-1 p-8">
         <div className="mx-auto max-w-3xl">
-          <h1 className="mb-8 text-2xl font-bold">Question #1</h1>
+          <h1 className="mb-8 text-2xl font-bold">{question.language} Exam</h1>
 
           <div className="mb-8">
             {question.image && (
@@ -114,7 +155,7 @@ export default function QuestionPage() {
           <textarea
             value={answer}
             onChange={(e) => setAnswer(e.target.value)}
-            placeholder={question.prompt}
+            placeholder={"Type your response here..."}
             className="w-full mb-8 min-h-[200px] p-4 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#EA5658]"
           />
 
@@ -132,8 +173,19 @@ export default function QuestionPage() {
               >
                 Submit
               </button>
-              <button className="px-4 py-2 bg-[#EA5658] text-white rounded-lg hover:bg-[#EB5759]">
-                Next
+              <button
+                onClick={handleNext}
+                disabled={nextLoading}
+                className="px-4 py-2 bg-[#EA5658] text-white rounded-lg hover:bg-[#EB5759] disabled:bg-[#EA5658]/50 disabled:cursor-not-allowed flex items-center space-x-2"
+              >
+                {nextLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
+                    <span>Loading...</span>
+                  </>
+                ) : (
+                  <span>Next</span>
+                )}
               </button>
             </div>
           </div>

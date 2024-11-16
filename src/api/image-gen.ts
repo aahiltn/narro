@@ -1,5 +1,5 @@
-import 'dotenv/config';
-import OpenAI from 'openai';
+import "dotenv/config";
+import OpenAI from "openai";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY, // Ensure the API key is securely set as an environment variable
@@ -21,7 +21,8 @@ export async function generateImageFromKeywords({
       messages: [
         {
           role: "system",
-          content: "You are a helpful assistant creating image descriptions for language learning materials.",
+          content:
+            "You are a helpful assistant creating image descriptions for language learning materials.",
         },
         {
           role: "user",
@@ -46,7 +47,7 @@ export async function generateImageFromKeywords({
       model: "dall-e-3",
       prompt: `Create a clear, educational image suitable for language learning: ${imageDescription}`,
       n: 1,
-      size: "1024x1024",
+      size: "1792x1024",
       quality: "standard",
       style: "natural",
     });
