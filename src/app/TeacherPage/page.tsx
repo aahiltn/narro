@@ -29,7 +29,7 @@ const LANGUAGES = [
 ];
 
 export default function TeacherUnitsPage() {
-  const [units, setUnits] = useState([])
+  const [units, setUnits] = useState([]);
   const {
     createUnit,
     loading: createLoading,
@@ -40,7 +40,9 @@ export default function TeacherUnitsPage() {
   const [currentKeyword, setCurrentKeyword] = useState("");
 
   useEffect(() => {
-    getUnits().then((res)=>{setUnits(res)})
+    getUnits().then((res) => {
+      setUnits(res);
+    });
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -83,6 +85,32 @@ export default function TeacherUnitsPage() {
     setFormData({ ...formData, keywords: newKeywords });
   };
 
+  const handleGenerateQuestion = async (unit: any) => {
+    try {
+      const response = await fetch("/api/questions/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          keywords: unit.keywords,
+          unitDescription: unit.teacherNotes,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.data.id) {
+        // Navigate to the question page using the correct path
+        window.location.href = `/question/${data.data.id}`;
+      } else {
+        console.error("Failed to generate question:", data.error);
+      }
+    } catch (error) {
+      console.error("Error generating question:", error);
+    }
+  };
+
   if (createLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -92,11 +120,7 @@ export default function TeacherUnitsPage() {
   }
 
   if (createError) {
-    return (
-      <div className="text-red-500">
-        Error: {(createError)?.message}
-      </div>
-    );
+    return <div className="text-red-500">Error: {createError?.message}</div>;
   }
 
   return (
@@ -122,7 +146,14 @@ export default function TeacherUnitsPage() {
             <p className="text-sm text-gray-600 mb-2">
               Keywords: {unit.keywords.join(", ")}
             </p>
-            <p className="text-sm">{unit.teacherNotes}</p>
+            <p className="text-sm mb-4">{unit.teacherNotes}</p>
+
+            <button
+              onClick={() => handleGenerateQuestion(unit)}
+              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors"
+            >
+              Generate Question
+            </button>
           </div>
         ))}
       </div>
