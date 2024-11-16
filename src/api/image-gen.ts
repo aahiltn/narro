@@ -28,7 +28,7 @@ export async function generateImageFromKeywords({
           content: `Create a detailed image description (2-3 sentences) that incorporates these keywords: ${keywords.join(
             ", "
           )}. This is for a ~9th grade level language learning unit about: ${unitDescription}. 
-          The description should be clear, visual, and appropriate for DALL-E to generate an image from. There should never be
+          The description should be very clear, visual, and appropriate for DALL-E to generate an image from. There should never be
           any text included in these images.`,
         },
       ],

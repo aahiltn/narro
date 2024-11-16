@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "node --loader ts-node/esm ./src/api/example-gen.ts",
+    "start": "node --loader ts-node/esm ./src/api/example-grade.ts",
     "lint": "next lint"
   },
   "dependencies": {
