@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET() {
+export async function getSections() {
+  'use server'
   try {
     const sections = await prisma.classSection.findMany({
       include: {
@@ -10,20 +11,20 @@ export async function GET() {
         units: true,
       },
     });
-    return NextResponse.json(sections);
+    return sections;
   } catch (error) {
-    return NextResponse.json(error, { status: 500 });
+    throw new Error('Failed to fetch sections');
   }
 }
 
-export async function POST(request: Request) {
+export async function createSection(data: any) {
+  'use server'
   try {
-    const body = await request.json();
     const section = await prisma.classSection.create({
-      data: body,
+      data,
     });
-    return NextResponse.json(section);
+    return section;
   } catch (error) {
-    return NextResponse.json(error, { status: 500 });
+    throw new Error('Failed to create section');
   }
 }
