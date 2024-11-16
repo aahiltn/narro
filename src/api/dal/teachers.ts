@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 
 export async function getTeachers() {
-  'use server'
+  "use server";
   try {
     const teachers = await prisma.teacher.findMany({
       include: {
@@ -11,18 +11,18 @@ export async function getTeachers() {
     });
     return teachers;
   } catch (error) {
-    throw new Error('Failed to fetch teachers');
+    throw new Error("Failed to fetch teachers");
   }
 }
 
 export async function createTeacher(data: any) {
-  'use server'
+  "use server";
   try {
     const teacher = await prisma.teacher.create({
       data,
     });
     return teacher;
   } catch (error) {
-    throw new Error('Failed to create teacher');
+    throw new Error("Failed to create teacher");
   }
 }
