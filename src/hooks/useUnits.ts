@@ -1,6 +1,5 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { Unit } from "@prisma/client";
-import { UnitCreate } from "@/lib/api/types";
 import { unitApi } from "@/lib/api/units";
 
 export function useGetUnits() {
@@ -32,7 +31,7 @@ export function useCreateUnit() {
   const [error, setError] = useState<Error | null>(null);
 
   const handleCreateUnit = useCallback(
-    async (data: UnitCreate) => {
+    async (data) => {
       if (loading) return;
 
       try {

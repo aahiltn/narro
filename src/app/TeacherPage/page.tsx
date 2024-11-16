@@ -3,6 +3,30 @@
 import { useEffect, useState } from "react";
 import { useGetUnits, useCreateUnit } from "@/hooks/useUnits";
 import { Dialog } from "@headlessui/react";
+import { XMarkIcon } from "@heroicons/react/24/solid";
+
+interface UnitFormData {
+  language: string;
+  keywords: string[];
+  teacherNotes: string;
+  classSectionId: string;
+  teacherId: string;
+}
+
+const LANGUAGES = [
+  "English",
+  "Spanish",
+  "French",
+  "German",
+  "Italian",
+  "Portuguese",
+  "Chinese",
+  "Japanese",
+  "Korean",
+  "Russian",
+  "Arabic",
+  "Hindi",
+];
 
 export default function TeacherUnitsPage() {
   const {
@@ -17,7 +41,8 @@ export default function TeacherUnitsPage() {
     error: createError,
   } = useCreateUnit();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState<UnitFormData>({});
+  const [currentKeyword, setCurrentKeyword] = useState("");
 
   useEffect(() => {
     fetchUnits();
@@ -26,14 +51,39 @@ export default function TeacherUnitsPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await createUnit(formData as UnitCreate);
+      const dataWithIds = {
+        ...formData,
+        classSectionId: "your_class_section_id",
+        teacherId: "your_teacher_id",
+      };
+      await createUnit(dataWithIds);
       setIsModalOpen(false);
       setFormData({});
-      // Refresh the units list after creating a new unit
       fetchUnits();
     } catch (error) {
       console.error("Failed to create unit:", error);
     }
+  };
+
+  const handleKeywordSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      if (currentKeyword.trim() && currentKeyword.length <= 20) {
+        const newKeywords = [
+          ...(formData.keywords || []),
+          currentKeyword.trim(),
+        ];
+        setFormData({ ...formData, keywords: newKeywords });
+        setCurrentKeyword("");
+      }
+    }
+  };
+
+  const removeKeyword = (keywordToRemove: string) => {
+    const newKeywords = (formData.keywords || []).filter(
+      (keyword) => keyword !== keywordToRemove
+    );
+    setFormData({ ...formData, keywords: newKeywords });
   };
 
   if (fetchLoading || createLoading) {
@@ -96,33 +146,59 @@ export default function TeacherUnitsPage() {
                 <label className="block text-sm font-medium mb-1">
                   Language
                 </label>
-                <input
-                  type="text"
+                <select
                   value={formData.language || ""}
                   onChange={(e) =>
                     setFormData({ ...formData, language: e.target.value })
                   }
-                  className="w-full border rounded p-2"
+                  className="w-full border rounded p-2 bg-white"
                   required
-                />
+                >
+                  <option value="">Select a language</option>
+                  {LANGUAGES.map((lang) => (
+                    <option key={lang} value={lang}>
+                      {lang}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>
                 <label className="block text-sm font-medium mb-1">
-                  Keywords (comma-separated)
+                  Keywords
                 </label>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {formData.keywords?.map((keyword) => (
+                    <span
+                      key={keyword}
+                      className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm flex items-center"
+                    >
+                      {keyword}
+                      <button
+                        type="button"
+                        onClick={() => removeKeyword(keyword)}
+                        className="ml-1 hover:text-blue-900"
+                      >
+                        <XMarkIcon className="h-4 w-4" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
                 <input
                   type="text"
-                  value={formData.keywords?.join(",") || ""}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      keywords: e.target.value.split(","),
-                    })
-                  }
+                  value={currentKeyword}
+                  onChange={(e) => {
+                    if (e.target.value.length <= 20) {
+                      setCurrentKeyword(e.target.value);
+                    }
+                  }}
+                  onKeyDown={handleKeywordSubmit}
+                  placeholder="Type and press Enter to add keyword (max 20 chars)"
                   className="w-full border rounded p-2"
-                  required
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  {20 - currentKeyword.length} characters remaining
+                </p>
               </div>
 
               <div>
