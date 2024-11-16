@@ -52,6 +52,7 @@ model Question {
   prompt    String
   language  String
   timeLimit DateTime?
+  keywords  String[]
   exam      Exam?     @relation(fields: [examId], references: [id])
   examId    String?   @db.ObjectId
   createdAt DateTime  @default(now())

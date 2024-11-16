@@ -62,7 +62,10 @@ function findClosestMatch(
 }
 
 // Function to call the LanguageTool API
-async function checkSpellingWithLanguageTool(sentence: string): Promise<any[]> {
+async function checkSpellingWithLanguageTool(
+  sentence: string,
+  language: string
+): Promise<any[]> {
   const response = await fetch(url, {
     method: "POST",
     headers: {
@@ -85,7 +88,8 @@ async function checkSpellingWithLanguageTool(sentence: string): Promise<any[]> {
 // Function to grade a sentence
 export async function gradeSentence(
   sentence: string,
-  keywords: Set<string>
+  keywords: Set<string>,
+  language: string
 ): Promise<number> {
   // Normalize the sentence by removing punctuation
   const cleanedSentence = removePunctuation(sentence.toLowerCase());
@@ -114,8 +118,10 @@ export async function gradeSentence(
   const basePenalty = 35 / numWords;
   const similarityThreshold = 0.6; // Minimum similarity for considering a partial match
 
+  const langCode = getLanguageCode(language);
+
   // Get errors (misspelled words) from LanguageTool
-  const matches = await checkSpellingWithLanguageTool(sentence);
+  const matches = await checkSpellingWithLanguageTool(sentence, langCode);
 
   // Check each word in the sentence against keywords
   wordsInSentence.forEach((word) => {
@@ -187,4 +193,23 @@ export async function gradeSentence(
   console.log(`Final Score (out of 100): ${finalScore}`);
 
   return finalScore;
+}
+
+function getLanguageCode(language: string): string {
+  const languageMap: { [key: string]: string } = {
+    English: "en",
+    Spanish: "es",
+    French: "fr",
+    German: "de",
+    Italian: "it",
+    Portuguese: "pt",
+    Chinese: "zh",
+    Japanese: "ja",
+    Korean: "ko",
+    Russian: "ru",
+    Arabic: "ar",
+    Hindi: "hi",
+  };
+
+  return languageMap[language] || "en"; // defaults to English if language not found
 }

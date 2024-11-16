@@ -1,6 +1,7 @@
 export interface GenerateQuestionRequest {
   keywords: string[];
   unitDescription: string;
+  language: string;
 }
 
 export interface MockUnit {
@@ -25,4 +26,4 @@ export const mockUnits: MockUnit[] = [
     description: "discussing weather conditions in Spanish",
     keywords: ["sunny", "rain", "cloud", "temperature"],
   },
-]; 
+];

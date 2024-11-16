@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Question } from "@prisma/client";
+import { Dialog as HeadlessDialog } from "@headlessui/react";
+import { gradeSentence } from "@/api/grader";
 
 export default function QuestionPage() {
   const params = useParams();
@@ -11,28 +13,47 @@ export default function QuestionPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [answer, setAnswer] = useState("");
+  const [showScore, setShowScore] = useState(false);
+  const [score, setScore] = useState<number | null>(null);
 
   useEffect(() => {
-    async function fetchQuestion() {
-      try {
-        const response = await fetch(`/api/questions/${params.id}`);
-        if (!response.ok) throw new Error("Failed to fetch question");
-        const data = await response.json();
-        setQuestion(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
-      } finally {
-        setLoading(false);
-      }
-    }
+    fetchQuestion();
+  }, []);
 
-    if (params.id) {
-      fetchQuestion();
+  const fetchQuestion = async () => {
+    try {
+      const response = await fetch(`/api/questions/${params.id}`);
+      if (!response.ok) throw new Error("Failed to fetch question");
+      const data = await response.json();
+      setQuestion(data);
+      setLoading(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+      setLoading(false);
     }
-  }, [params.id]);
+  };
 
   const handleBack = () => {
     router.push("/TeacherPage");
+  };
+
+  const handleSubmit = async () => {
+    try {
+      if (!question) return error;
+
+      const keywordSet = new Set(question.keywords);
+      const finalScore = await gradeSentence(
+        answer,
+        keywordSet,
+        question.language
+      );
+
+      setScore(finalScore);
+      setShowScore(true);
+    } catch (error) {
+      console.error("Error grading answer:", error);
+      setError("Failed to grade answer");
+    }
   };
 
   if (loading)
@@ -104,12 +125,53 @@ export default function QuestionPage() {
             >
               <span>Back</span>
             </button>
-            <button className="px-4 py-2 bg-[#EA5658] text-white rounded-lg hover:bg-[#EB5759]">
-              Next
-            </button>
+            <div className="flex space-x-2">
+              <button
+                onClick={handleSubmit}
+                className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800"
+              >
+                Submit
+              </button>
+              <button className="px-4 py-2 bg-[#EA5658] text-white rounded-lg hover:bg-[#EB5759]">
+                Next
+              </button>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Score Modal */}
+      <HeadlessDialog
+        open={showScore}
+        onClose={() => setShowScore(false)}
+        className="fixed inset-0 z-10 overflow-y-auto"
+      >
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="fixed inset-0 bg-black opacity-30" />
+
+          <HeadlessDialog.Panel className="relative bg-white rounded-lg p-8 max-w-md w-full mx-4 shadow-xl">
+            <HeadlessDialog.Title className="text-2xl font-bold mb-4">
+              Your Score
+            </HeadlessDialog.Title>
+
+            <div className="text-center">
+              <div className="text-6xl font-bold text-[#EA5658] mb-4">
+                {score?.toFixed(1)}%
+              </div>
+              <p className="text-gray-600">
+                Keep practicing to improve your language skills!
+              </p>
+            </div>
+
+            <button
+              onClick={() => setShowScore(false)}
+              className="mt-6 w-full px-4 py-2 bg-[#EA5658] text-white rounded-lg hover:bg-[#EB5759]"
+            >
+              Close
+            </button>
+          </HeadlessDialog.Panel>
+        </div>
+      </HeadlessDialog>
 
       {/* Progress bar */}
       <div className="fixed bottom-0 left-0 w-full">

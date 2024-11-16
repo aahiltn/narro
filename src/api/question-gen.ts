@@ -19,6 +19,7 @@ export async function createQuestionFromKeywords({
       image: imageUrl,
       prompt: description,
       language,
+      keywords,
     };
 
     console.log("PAYLOAD: ", questionData);
