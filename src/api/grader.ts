@@ -83,7 +83,7 @@ async function checkSpellingWithLanguageTool(sentence: string): Promise<any[]> {
 }
 
 // Function to grade a sentence
-async function gradeSentence(
+export async function gradeSentence(
   sentence: string,
   keywords: Set<string>
 ): Promise<number> {
@@ -188,10 +188,3 @@ async function gradeSentence(
 
   return finalScore;
 }
-
-// Example usage
-(async () => {
-  const sentence = "La cuccaracha es triste en este momento bogoso.";
-  const keywords = new Set(["cucaracha", "triste", "gato"]);
-  await gradeSentence(sentence, keywords);
-})();
