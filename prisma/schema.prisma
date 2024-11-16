@@ -3,31 +3,43 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql" // You can change this to your preferred database
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
 model Student {
-  id            Int            @id @default(autoincrement())
+  id            String               @id @default(auto()) @map("_id") @db.ObjectId
   name          String
-  classSections ClassSection[] @relation("StudentToSection")
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  classSections StudentClassSection[]
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+}
+
+model StudentClassSection {
+  id              String       @id @default(auto()) @map("_id") @db.ObjectId
+  student         Student      @relation(fields: [studentId], references: [id])
+  studentId       String       @db.ObjectId
+  classSection    ClassSection @relation(fields: [classSectionId], references: [id])
+  classSectionId  String       @db.ObjectId
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@unique([studentId, classSectionId])
 }
 
 model ClassSection {
-  id            Int       @id @default(autoincrement())
+  id            String                @id @default(auto()) @map("_id") @db.ObjectId
   sectionNumber String
-  students      Student[] @relation("StudentToSection")
+  students      StudentClassSection[]
   teacher       Teacher   @relation(fields: [teacherId], references: [id])
-  teacherId     Int
+  teacherId     String    @db.ObjectId
   units         Unit[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
 
 model Teacher {
-  id           Int            @id @default(autoincrement())
+  id           String         @id @default(auto()) @map("_id") @db.ObjectId
   sections     ClassSection[]
   units        Unit[]
   createdAt    DateTime       @default(now())
@@ -35,18 +47,18 @@ model Teacher {
 }
 
 model Question {
-  id        Int       @id @default(autoincrement())
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
   image     String?   // URL or path to image
   prompt    String
   timeLimit DateTime?
   exam      Exam?     @relation(fields: [examId], references: [id])
-  examId    Int?
+  examId    String?   @db.ObjectId
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
 
 model Exam {
-  id        Int        @id @default(autoincrement())
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
   questions Question[]
   timeLimit DateTime?
   createdAt DateTime   @default(now())
@@ -54,12 +66,12 @@ model Exam {
 }
 
 model Unit {
-  id            Int          @id @default(autoincrement())
+  id            String       @id @default(auto()) @map("_id") @db.ObjectId
   keywords      String[]
   classSection  ClassSection @relation(fields: [classSectionId], references: [id])
-  classSectionId Int
+  classSectionId String      @db.ObjectId
   teacher       Teacher      @relation(fields: [teacherId], references: [id])
-  teacherId     Int
+  teacherId     String       @db.ObjectId
   language      String
   teacherNotes  String
   createdAt     DateTime     @default(now())
