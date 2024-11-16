@@ -41,7 +41,7 @@ export default function TeacherUnitsPage() {
     error: createError,
   } = useCreateUnit();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState<UnitFormData>({});
+  const [formData, setFormData] = useState<UnitFormData>({} as UnitFormData);
   const [currentKeyword, setCurrentKeyword] = useState("");
 
   useEffect(() => {
@@ -51,14 +51,14 @@ export default function TeacherUnitsPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const dataWithIds = {
-        ...formData,
-        classSectionId: "your_class_section_id",
-        teacherId: "your_teacher_id",
+      const submitData = {
+        language: formData.language,
+        keywords: formData.keywords || [],
+        teacherNotes: formData.teacherNotes,
       };
-      await createUnit(dataWithIds);
+      await createUnit(submitData);
       setIsModalOpen(false);
-      setFormData({});
+      setFormData({} as UnitFormData);
       fetchUnits();
     } catch (error) {
       console.error("Failed to create unit:", error);

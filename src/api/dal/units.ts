@@ -17,6 +17,7 @@ export async function getUnits() {
 }
 
 export async function createUnit(data: any) {
+  console.log("BACKEND: ", data);
   try {
     const unit = await prisma.unit.create({
       data,

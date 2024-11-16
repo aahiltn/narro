@@ -27,6 +27,7 @@ class UnitApi {
 
   async create(data: UnitCreate) {
     try {
+      console.log("API: ", data);
       const res = await fetch(BASE_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

@@ -32,6 +32,7 @@ export function useCreateUnit() {
 
   const handleCreateUnit = useCallback(
     async (data) => {
+      console.log("HOOK: ", data);
       if (loading) return;
 
       try {
