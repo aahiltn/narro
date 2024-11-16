@@ -63,6 +63,8 @@ model Exam {
   timeLimit DateTime?
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+  unit      Unit       @relation(fields: [unitId], references: [id])
+  unitId    String     @db.ObjectId
 }
 
 model Unit {
@@ -74,6 +76,7 @@ model Unit {
   teacherId     String       @db.ObjectId
   language      String
   teacherNotes  String
+  exams         Exam[]
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
 } 
