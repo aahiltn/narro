@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useGetUnits, useCreateUnit } from "@/hooks/useUnits";
 import { Dialog } from "@headlessui/react";
-import { UnitCreate } from "@/lib/api/types";
 
 export default function TeacherUnitsPage() {
   const {
@@ -18,7 +17,7 @@ export default function TeacherUnitsPage() {
     error: createError,
   } = useCreateUnit();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState<Partial<UnitCreate>>({});
+  const [formData, setFormData] = useState({});
 
   useEffect(() => {
     fetchUnits();
