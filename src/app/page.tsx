@@ -1,5 +1,6 @@
 'use client'
-import { createStudent } from "@/api/dal/students";
+import { createStudent, getStudents } from "@/api/dal/students";
+import { useEffect, useState } from "react";
 
 export default function Home() {
   const handleCreateStudent = async () => {

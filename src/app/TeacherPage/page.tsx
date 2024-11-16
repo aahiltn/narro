@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useGetUnits, useCreateUnit } from "@/hooks/useUnits";
 import { Dialog } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/solid";
+import { getUnits } from "@/api/dal/units";
 
 interface UnitFormData {
   name: string;
@@ -28,12 +29,7 @@ const LANGUAGES = [
 ];
 
 export default function TeacherUnitsPage() {
-  const {
-    units,
-    loading: fetchLoading,
-    error: fetchError,
-    fetchUnits,
-  } = useGetUnits();
+  const [units, setUnits] = useState([])
   const {
     createUnit,
     loading: createLoading,
@@ -44,8 +40,8 @@ export default function TeacherUnitsPage() {
   const [currentKeyword, setCurrentKeyword] = useState("");
 
   useEffect(() => {
-    fetchUnits();
-  }, [fetchUnits]);
+    getUnits().then((res)=>{setUnits(res)})
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,7 +57,6 @@ export default function TeacherUnitsPage() {
       await createUnit(submitData);
       setIsModalOpen(false);
       setFormData({} as UnitFormData);
-      fetchUnits();
     } catch (error) {
       console.error("Failed to create unit:", error);
     }
@@ -88,7 +83,7 @@ export default function TeacherUnitsPage() {
     setFormData({ ...formData, keywords: newKeywords });
   };
 
-  if (fetchLoading || createLoading) {
+  if (createLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900"></div>
@@ -96,10 +91,10 @@ export default function TeacherUnitsPage() {
     );
   }
 
-  if (fetchError || createError) {
+  if (createError) {
     return (
       <div className="text-red-500">
-        Error: {(fetchError || createError)?.message}
+        Error: {(createError)?.message}
       </div>
     );
   }

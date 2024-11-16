@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { Unit } from "@prisma/client";
 import { unitApi } from "@/lib/api/units";
+import { createUnit, getUnits } from "@/api/dal/units";
 
 export function useGetUnits() {
   const [units, setUnits] = useState<Unit[] | null>(null);
@@ -13,7 +14,7 @@ export function useGetUnits() {
     try {
       setLoading(true);
       setError(null);
-      const data = await unitApi.getAll();
+      const data = await getUnits();
       setUnits(data);
     } catch (err) {
       console.error("Error in useGetUnits:", err);
@@ -38,7 +39,7 @@ export function useCreateUnit() {
       try {
         setLoading(true);
         setError(null);
-        const result = await unitApi.create(data);
+        const result = await createUnit(data);
         return result;
       } catch (err) {
         console.error("Error in useCreateUnit:", err);
