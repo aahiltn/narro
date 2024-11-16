@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/Narro-logo.svg" alt="Narro Logo" width="400"/>
+  <img src="public/Narro-logo.svg" alt="Narro Logo" width="400" style="background-color: white;"/>
 </p>
 
 # Narro - Language Learning for the Modern Age
@@ -96,4 +96,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-<p align="center">Made with ❤️ by the Narro Team</p>
+<p align="center">Made with ❤️ by the Narro Team (Aahil, Caio, Gavin, Kaige, Wei)</p>
