@@ -62,7 +62,10 @@ function findClosestMatch(
 }
 
 // Function to call the LanguageTool API
-async function checkSpellingWithLanguageTool(sentence: string): Promise<any[]> {
+async function checkSpellingWithLanguageTool(
+  sentence: string,
+  language: string
+): Promise<any[]> {
   const response = await fetch(url, {
     method: "POST",
     headers: {
@@ -85,13 +88,14 @@ async function checkSpellingWithLanguageTool(sentence: string): Promise<any[]> {
 // Function to grade a sentence
 export async function gradeSentence(
   sentence: string,
-  keywords: Set<string>
+  keywords: Set<string>,
+  language: string
 ): Promise<number> {
-  // Normalize the sentence by removing punctuation
+  // Normalize the sentence by removing punctuation and converting to lowercase
   const cleanedSentence = removePunctuation(sentence.toLowerCase());
   const wordsInSentence = new Set(cleanedSentence.split(/\s+/));
 
-  // Normalize keywords
+  // Normalize keywords - convert all to lowercase
   const cleanedKeywords = new Set(
     Array.from(keywords).map((keyword) =>
       removePunctuation(keyword.toLowerCase())
@@ -112,79 +116,67 @@ export async function gradeSentence(
 
   // Set base penalty and similarity threshold for meaningful matches
   const basePenalty = 35 / numWords;
-  const similarityThreshold = 0.6; // Minimum similarity for considering a partial match
+  const similarityThreshold = 0.6;
+
+  const langCode = getLanguageCode(language);
 
   // Get errors (misspelled words) from LanguageTool
-  const matches = await checkSpellingWithLanguageTool(sentence);
+  const matches = await checkSpellingWithLanguageTool(sentence, langCode);
 
-  // Check each word in the sentence against keywords
+  // Check each word in the sentence against keywords (now case insensitive)
   wordsInSentence.forEach((word) => {
-    if (cleanedKeywords.has(word)) {
-      correctKeywords.add(word);
+    const wordLower = word.toLowerCase();
+    if (cleanedKeywords.has(wordLower)) {
+      correctKeywords.add(wordLower);
     } else {
       const [closestKeyword, similarity] = findClosestMatch(
-        word,
+        wordLower,
         cleanedKeywords
       );
       closestMatches.push({ word, closestKeyword, similarity });
 
       const isMisspelled = matches.some(
         (match: any) =>
-          sentence.slice(match.offset, match.offset + match.length) === word
+          sentence
+            .toLowerCase()
+            .slice(match.offset, match.offset + match.length)
+            .toLowerCase() === wordLower
       );
 
       if (isMisspelled) {
-        // Apply spelling penalty only for misspelled words
         if (closestKeyword && similarity >= 0.8) {
-          correctKeywords.add(closestKeyword); // Treat as correct with partial credit
-          spellingPenalty += basePenalty * 0.5; // Partial penalty for close match
+          correctKeywords.add(closestKeyword);
+          spellingPenalty += basePenalty * 0.5;
         } else if (closestKeyword && similarity >= similarityThreshold) {
-          spellingPenalty += basePenalty; // Mild penalty for close matches
+          spellingPenalty += basePenalty;
         } else {
-          spellingPenalty += basePenalty * 1.5; // Strong penalty for distant matches
+          spellingPenalty += basePenalty * 1.5;
         }
       }
     }
   });
 
-  // Calculate the keyword score after adjusting for near matches
   const keywordScore = (correctKeywords.size / numKeywords) * 100;
-
-  // Calculate the final score
   const finalScore = Math.max(keywordScore - spellingPenalty, 0);
 
-  // Display results
-  console.log(`Sentence: ${sentence}`);
-  console.log(`Correct Keywords Found: ${Array.from(correctKeywords)}`);
-  console.log(`Words and Closest Matches:`);
-  closestMatches.forEach(({ word, closestKeyword, similarity }) => {
-    console.log(
-      `  - Word: ${word}, Closest Match: ${closestKeyword}, Similarity: ${similarity.toFixed(
-        2
-      )}`
-    );
-  });
-
-  console.log(`Errors Identified by LanguageTool:`);
-  matches.forEach((match: any) => {
-    console.log(`  - Error: ${match.message}`);
-    console.log(
-      `    Word: "${sentence.slice(match.offset, match.offset + match.length)}"`
-    );
-    console.log(`    Rule: ${match.rule.description}`);
-    console.log(
-      `    Suggestion: ${
-        match.replacements
-          ? match.replacements.map((r: any) => r.value).join(", ")
-          : "None"
-      }`
-    );
-    console.log(`    Offset: ${match.offset}, Length: ${match.length}`);
-  });
-
-  console.log(`Keyword Score (out of 100): ${keywordScore}`);
-  console.log(`Spelling Penalty (relative): ${spellingPenalty}`);
-  console.log(`Final Score (out of 100): ${finalScore}`);
-
   return finalScore;
+}
+
+function getLanguageCode(language: string): string {
+  const languageMap: { [key: string]: string } = {
+    English: "en",
+    Spanish: "es",
+    French: "fr",
+    German: "de",
+    Italian: "it",
+    Portuguese: "pt",
+    Chinese: "zh",
+    Japanese: "ja",
+    Korean: "ko",
+    Russian: "ru",
+    Arabic: "ar",
+    Hindi: "hi",
+  };
+
+  return languageMap[language] || "en"; // defaults to English if language not found
 }

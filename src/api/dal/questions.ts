@@ -20,6 +20,7 @@ export async function createQuestion(data: {
   prompt: string;
   image?: string | null;
   language: string;
+  keywords: string[];
 }): Promise<Question> {
   try {
     const question = await prisma.question.create({
@@ -27,11 +28,13 @@ export async function createQuestion(data: {
         prompt: data.prompt,
         image: data.image || null,
         language: data.language,
+        keywords: data.keywords,
       },
     });
 
     // Return a plain object instead of the Prisma model
     return {
+      keywords: question.keywords,
       id: question.id,
       prompt: question.prompt,
       image: question.image,
