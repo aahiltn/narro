@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useGetUnits, useCreateUnit } from "@/hooks/useUnits";
+import { useCreateUnit } from "@/hooks/useUnits";
 import { Dialog } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import { getUnits } from "@/api/dal/units";
@@ -38,6 +38,9 @@ export default function TeacherUnitsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState<UnitFormData>({} as UnitFormData);
   const [currentKeyword, setCurrentKeyword] = useState("");
+  const [questionLoading, setQuestionLoading] = useState<
+    Record<string, boolean>
+  >({});
 
   useEffect(() => {
     getUnits().then((res) => {
@@ -87,6 +90,8 @@ export default function TeacherUnitsPage() {
 
   const handleGenerateQuestion = async (unit: any) => {
     try {
+      setQuestionLoading((prev) => ({ ...prev, [unit.id]: true }));
+
       const response = await fetch("/api/questions/generate", {
         method: "POST",
         headers: {
@@ -101,13 +106,14 @@ export default function TeacherUnitsPage() {
       const data = await response.json();
 
       if (data.success && data.data.id) {
-        // Navigate to the question page using the correct path
         window.location.href = `/question/${data.data.id}`;
       } else {
         console.error("Failed to generate question:", data.error);
       }
     } catch (error) {
       console.error("Error generating question:", error);
+    } finally {
+      setQuestionLoading((prev) => ({ ...prev, [unit.id]: false }));
     }
   };
 
@@ -150,7 +156,8 @@ export default function TeacherUnitsPage() {
 
             <button
               onClick={() => handleGenerateQuestion(unit)}
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors"
+              disabled={questionLoading[unit.id]}
+              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors disabled:bg-green-300"
             >
               Generate Question
             </button>
