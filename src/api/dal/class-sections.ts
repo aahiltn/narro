@@ -1,8 +1,7 @@
-import { NextResponse } from "next/server";
+'use server'
 import { prisma } from "@/lib/prisma";
 
 export async function getSections() {
-  'use server'
   try {
     const sections = await prisma.classSection.findMany({
       include: {
@@ -18,7 +17,6 @@ export async function getSections() {
 }
 
 export async function createSection(data: any) {
-  'use server'
   try {
     const section = await prisma.classSection.create({
       data,

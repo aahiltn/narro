@@ -1,7 +1,7 @@
+'use server'
 import { prisma } from "@/lib/prisma";
 
 export async function getExams() {
-  'use server'
   try {
     const exams = await prisma.exam.findMany({
       include: {
@@ -15,7 +15,6 @@ export async function getExams() {
 }
 
 export async function createExam(data: any) {
-  'use server'
   try {
     const exam = await prisma.exam.create({
       data,
