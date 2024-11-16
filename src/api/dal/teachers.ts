@@ -1,7 +1,7 @@
+'use server'
 import { prisma } from "@/lib/prisma";
 
 export async function getTeachers() {
-  'use server'
   try {
     const teachers = await prisma.teacher.findMany({
       include: {
@@ -16,7 +16,6 @@ export async function getTeachers() {
 }
 
 export async function createTeacher(data: any) {
-  'use server'
   try {
     const teacher = await prisma.teacher.create({
       data,
